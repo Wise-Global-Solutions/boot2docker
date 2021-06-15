@@ -178,7 +178,7 @@ ENV LINUX_GPG_KEYS \
 		647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 4.19.103
+ENV LINUX_VERSION 5.12.9
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -250,10 +250,11 @@ RUN setConfs="$(grep -vEh '^[#-]' /kernel-config.d/* | sort -u)"; \
 	unsetConfs=( $unsetConfs ); \
 	unset IFS; \
 	\
+# https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg2140886.html
 	make -C /usr/src/linux \
 		defconfig \
-		kvmconfig \
-		xenconfig \
+		kvm_guest.config \
+		xen.config \
 		> /dev/null; \
 	\
 	( \
