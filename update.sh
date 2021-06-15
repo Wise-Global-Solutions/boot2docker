@@ -15,7 +15,7 @@ mirrors=(
 kernelBase='5.12'
 # https://github.com/boot2docker/boot2docker/issues/1398
 # https://download.virtualbox.org/virtualbox/
-vboxBase='5'
+vboxBase='6'
 
 # avoid issues with slow Git HTTP interactions (*cough* sourceforge *cough*)
 export GIT_HTTP_LOW_SPEED_LIMIT='100'
