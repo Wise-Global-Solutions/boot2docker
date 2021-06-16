@@ -441,6 +441,15 @@ RUN DOCKER_CHANNEL='stable'; \
 		chroot . "$binary" --version; \
 	done
 
+# set up docker
+RUN { \
+		echo '{'; \
+		echo '    "features": {'; \
+		echo '        "buildkit": true'; \
+		echo '    }'; \
+		echo '}'; \
+	} > /etc/docker/daemon.json
+
 # set up a few branding bits
 RUN { \
 		echo 'NAME=Boot2Docker'; \
