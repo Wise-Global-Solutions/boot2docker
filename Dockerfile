@@ -442,7 +442,8 @@ RUN DOCKER_CHANNEL='stable'; \
 	done
 
 # set up docker
-RUN { \
+RUN mkdir -p /etc/docker; \
+	{ \
 		echo '{'; \
 		echo '    "features": {'; \
 		echo '        "buildkit": true'; \
