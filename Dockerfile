@@ -442,14 +442,14 @@ RUN DOCKER_CHANNEL='stable'; \
 	done
 
 # set up docker
-RUN mkdir -p /etc/docker; \
+RUN mkdir -p etc/docker; \
 	{ \
 		echo '{'; \
 		echo '    "features": {'; \
 		echo '        "buildkit": true'; \
 		echo '    }'; \
 		echo '}'; \
-	} > /etc/docker/daemon.json
+	} > etc/docker/daemon.json
 
 # set up a few branding bits
 RUN { \
