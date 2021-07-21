@@ -26,8 +26,11 @@ jobs:
       - name: Build ISO
         run: |
           set -Eeuo pipefail -x
-          docker build -t boot2docker/boot2docker .
-          docker run --rm boot2docker/boot2docker > boot2docker.iso
+          docker build -t boot2docker .
+          docker_container_id=$(docker create boot2docker)
+          docker start $docker_container_id > boot2docker.iso
+          docker exec $docker_container_id cat /tmp/stats/state.md > release.md
+          docker exec $docker_container_id cat /tmp/stats/sums.md >> release.md
       - name: '"ls"'
         run: ls -lh boot2docker.iso
       - name: '"docker images"'
@@ -36,5 +39,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: boot2docker.iso
+          body_path: release.md
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB}}
