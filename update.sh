@@ -13,6 +13,7 @@ mirrors=(
 
 # https://www.kernel.org/
 kernelBase='5.10'
+dockerBase='20.10'
 # https://github.com/boot2docker/boot2docker/issues/1398
 # https://download.virtualbox.org/virtualbox/
 vboxBase='6'
@@ -64,6 +65,15 @@ kernelVersion="$(
 )"
 seds+=(
 	-e 's!^(ENV LINUX_VERSION).*!\1 '"$kernelVersion"'!'
+)
+
+dockerVersion="$(
+	wget -qO- 'https://api.github.com/repos/moby/moby/releases' \
+		| jq -r --arg base "v$dockerBase" '[.[] | .tag_name | select(startswith($base + "."))][0]' \
+		| sed -e 's!^v!!'
+)"
+seds+=(
+	-e 's!^(ENV DOCKER_VERSION).*!\1 '"$dockerVersion"'!'
 )
 
 #vboxVersion="$(wget -qO- 'https://download.virtualbox.org/virtualbox/LATEST-STABLE.TXT')"
