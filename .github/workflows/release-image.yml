@@ -28,9 +28,12 @@ jobs:
           set -Eeuo pipefail -x
           docker build -t boot2docker .
           docker_container_id=$(docker create boot2docker)
-          docker start $docker_container_id > boot2docker.iso
-          docker exec $docker_container_id cat /tmp/stats/state.md > release.md
-          docker exec $docker_container_id cat /tmp/stats/sums.md >> release.md
+          docker cp $docker_container_id:/tmp/boot2docker.iso boot2docker.iso
+          docker cp $docker_container_id:/tmp/stats/state.md state.md
+          docker cp $docker_container_id:/tmp/stats/sums.md sums.md
+          docker rm $docker_container_id
+          cat state.md > release.md
+          cat sums.md >> release.md
       - name: '"ls"'
         run: ls -lh boot2docker.iso
       - name: '"docker images"'
