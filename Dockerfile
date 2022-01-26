@@ -466,7 +466,8 @@ RUN { \
 	for num in 0 1 2 3; do \
 		echo "server $num.boot2docker.pool.ntp.org"; \
 	done > etc/ntp.conf; \
-	rm -v etc/sysconfig/ntpserver
+	rm -v etc/sysconfig/ntpserver; \
+	sed -i "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=12.0|g" etc/init.d/tc-functions
 
 COPY files/forgiving-getty files/shutdown ./usr/local/sbin/
 
