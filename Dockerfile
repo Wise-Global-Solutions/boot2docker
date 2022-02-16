@@ -179,7 +179,7 @@ ENV LINUX_GPG_KEYS \
 		647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 5.10.100
+ENV LINUX_VERSION 5.10.93
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -469,6 +469,12 @@ RUN { \
 	done > etc/ntp.conf; \
 	rm -v etc/sysconfig/ntpserver; \
 	sed -i "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=12.0|g" etc/init.d/tc-functions
+
+# fix tce-load
+RUN mv etc/init.d/tc-functions etc/init.d/tc-functions.orig; \
+	sed "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=12.0|g" \
+		etc/init.d/tc-functions.orig \
+		> etc/init.d/tc-functions
 
 COPY files/forgiving-getty files/shutdown ./usr/local/sbin/
 
