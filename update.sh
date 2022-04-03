@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# TODO http://distro.ibiblio.org/tinycorelinux/latest-x86_64
-major='12.x'
-version='12.0' # TODO auto-detect latest
-# 9.x doesn't seem to use ".../archive/X.Y.Z/..." in the same way as 8.x :(
+# http://tinycorelinux.net/
+major='13.x'
+version='13.0'
 
 mirrors=(
 	http://distro.ibiblio.org/tinycorelinux
@@ -12,17 +11,54 @@ mirrors=(
 )
 
 # https://www.kernel.org/
-kernelBase='5.10'
+kernelBase='5.15'
+# https://download.docker.com/linux/static/stable/x86_64/
 dockerBase='20.10'
-# https://github.com/boot2docker/boot2docker/issues/1398
 # https://download.virtualbox.org/virtualbox/
 vboxBase='6'
+# https://www.parallels.com/products/desktop/download/
+parallelsBase='17'
 
 # avoid issues with slow Git HTTP interactions (*cough* sourceforge *cough*)
 export GIT_HTTP_LOW_SPEED_LIMIT='100'
 export GIT_HTTP_LOW_SPEED_TIME='2'
 # ... or servers being down
 wget() { command wget --timeout=2 "$@" -o /dev/null; }
+
+tclLatest="$(wget -qO- 'http://distro.ibiblio.org/tinycorelinux/latest-x86_64')"
+if [ $tclLatest != $version ]; then
+	echo "Tiny Core Linux has an update! ($tclLatest)"
+	exit 1
+fi
+
+kernelLatest="$(
+	wget -qO- 'https://www.kernel.org/releases.json' \
+		| jq -r '[.releases[] | select(.moniker == "longterm") | .version] | .[0]'
+)"
+if ! [[ $kernelLatest =~ ^$kernelBase[0-9.]+ ]]; then
+	echo "Linux Kernel has an update! ($kernelLatest)"
+	exit 1
+fi
+
+dockerLatest="$(
+	wget -qO- 'https://api.github.com/repos/moby/moby/releases' \
+		| jq -r '.[0].name'
+)"
+if ! [[ $dockerLatest =~ ^v$dockerBase[0-9.]+ ]]; then
+	echo "Docker has an update! ($dockerLatest)"
+	exit 1
+fi
+
+vboxLatest="$(wget -qO- 'https://download.virtualbox.org/virtualbox/LATEST-STABLE.TXT')"
+if ! [[ $vboxLatest =~ ^$vboxBase[0-9.]+ ]]; then
+	echo "VirtualBox has an update! ($vboxLatest)"
+	exit 1
+fi
+
+if ! wget -qO- --spider "https://www.parallels.com/directdownload/pd$parallelsBase/image/"; then
+	echo 'Parallels Desktop has an update!'
+	exit 1
+fi
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -49,7 +85,6 @@ arch='x86_64'
 rootfs='rootfs64.gz'
 
 rootfsMd5="$(
-# 9.x doesn't seem to use ".../archive/X.Y.Z/..." in the same way as 8.x :(
 	fetch \
 		"$arch/archive/$version/distribution_files/$rootfs.md5.txt" \
 		"$arch/release/distribution_files/$rootfs.md5.txt"
@@ -76,7 +111,6 @@ seds+=(
 	-e 's!^(ENV DOCKER_VERSION).*!\1 '"$dockerVersion"'!'
 )
 
-#vboxVersion="$(wget -qO- 'https://download.virtualbox.org/virtualbox/LATEST-STABLE.TXT')"
 vboxVersion="$(
 	wget -qO- 'https://download.virtualbox.org/virtualbox/' \
 		| grep -oE 'href="[0-9.]+/?"' \
@@ -95,13 +129,20 @@ seds+=(
 	-e 's!^(ENV VBOX_SHA256).*!\1 '"$vboxSha256"'!'
 )
 
-# PARALLELS_VERSION: https://github.com/boot2docker/boot2docker/pull/1332#issuecomment-420273330
+parallelsVersion="$(
+	$(which wget) -SO- --spider "https://www.parallels.com/directdownload/pd$parallelsBase/image/" 2>&1 >/dev/null \
+		| grep -oE 'https://download.parallels.com/desktop/.* \[following]' \
+		| sed -re 's|.*/([0-9.-]+)/.*|\1|'
+)"
+seds+=(
+	-e 's!^(ENV PARALLELS_VERSION).*!\1 '"$parallelsVersion"'!'
+)
 
 xenVersion="$(
 	git ls-remote --tags 'https://github.com/xenserver/xe-guest-utilities.git' \
 		| cut -d/ -f3 \
 		| cut -d^ -f1 \
-		| grep -E '^v[0-9]+' \
+		| grep -E '^v\d+' \
 		| cut -dv -f2- \
 		| sort -rV \
 		| head -1
