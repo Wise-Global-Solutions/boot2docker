@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 SHELL ["/bin/bash", "-Eeuo", "pipefail", "-xc"]
 
@@ -392,8 +392,9 @@ RUN wget -O /xen.tgz "https://github.com/xenserver/xe-guest-utilities/archive/v$
 	tar --extract --file /xen.tgz --directory /usr/src/xen --strip-components 1; \
 	rm /xen.tgz
 RUN cd /usr/src/xen; \
-	GOPATH='/usr/src/xen/GOPATH' go get
-RUN GOPATH='/usr/src/xen/GOPATH' make -C /usr/src/xen -j "$(nproc)" PRODUCT_VERSION="$XEN_VERSION" RELEASE='boot2docker'; \
+	go mod vendor; \
+	mkdir vendor/xe-guest-utilities
+RUN make -C /usr/src/xen -j "$(nproc)" VENDORDIR="/usr/src/xen/vendor/xe-guest-utilities" PRODUCT_VERSION="$XEN_VERSION" RELEASE='boot2docker'; \
 	tar --extract --file "/usr/src/xen/build/dist/xe-guest-utilities_$XEN_VERSION-boot2docker_x86_64.tgz"; \
 	tcl-chroot xenstore || [ "$?" = 1 ]
 
