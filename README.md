@@ -1,16 +1,16 @@
-# DEPRECATED
-
-Boot2Docker is officially deprecated and unmaintained.  It is recommended that users transition from Boot2Docker over to [Docker Desktop](https://www.docker.com/products/docker-desktop) instead (especially with [the new WSL2 backend, which supports Windows 10 Home](https://www.docker.com/blog/docker-desktop-for-windows-home-is-here/)).
-
-These days there are a *lot* of tools designed to help spin up environments, and it's relatively easy to get something up and running with Docker installed with minimal effort.
-
 # Boot2Docker
 
-[![Build Status](https://travis-ci.org/boot2docker/boot2docker.svg?branch=master)](https://travis-ci.org/boot2docker/boot2docker)
+[![Build Status](https://github.com/silver886/boot2docker/actions/workflows/ci.yaml/badge.svg)](https://github.com/silver886/boot2docker/actions/workflows/ci.yaml)
 
 Boot2Docker is a lightweight Linux distribution made specifically to run
 [Docker](https://www.docker.com/) containers. It runs completely from RAM, is a
 ~45MB download and boots quickly.
+
+## Important Note
+
+Boot2Docker is officially deprecated and unmaintained.  It is recommended that users transition from Boot2Docker over to [Docker Desktop](https://www.docker.com/products/docker-desktop) instead (especially with [the new WSL2 backend, which supports Windows 10 Home](https://www.docker.com/blog/docker-desktop-for-windows-home-is-here/)).
+
+These days there are a *lot* of tools designed to help spin up environments, and it's relatively easy to get something up and running with Docker installed with minimal effort.
 
 ## Features
 
@@ -30,15 +30,15 @@ Boot2Docker is designed and tuned for development.
 ## Installation
 
 Installation should be performed via [Docker Toolbox](https://docs.docker.com/toolbox/)
-which installs [Docker Machine](https://docs.docker.com/machine/overview/), 
+which installs [Docker Machine](https://docs.docker.com/machine/overview/),
 the Boot2Docker VM, and other necessary tools.
 
 The [ISO can be downloaded
-here](https://github.com/boot2docker/boot2docker/releases).
+here](https://github.com/silver886/boot2docker/releases).
 
 ## How to use
 
-Boot2Docker is used via [Docker Machine](https://docs.docker.com/machine/overview/) 
+Boot2Docker is used via [Docker Machine](https://docs.docker.com/machine/overview/)
 (installed as part of Docker Toolbox) which leverages VirtualBox's `VBoxManage` to
 initialise, start, stop and delete the VM right from the command line.
 
@@ -73,7 +73,7 @@ docker-machine restart default
 #### Installing secure Registry certificates
 
 As discussed in the [Docker Engine documentation](https://docs.docker.com/engine/security/certificates/#/understanding-the-configuration)
-certificates should be placed at `/etc/docker/certs.d/hostname/ca.crt` 
+certificates should be placed at `/etc/docker/certs.d/hostname/ca.crt`
 where `hostname` is your Registry server's hostname.
 
 ```console
@@ -84,7 +84,7 @@ exit
 docker-machine restart
 ```
 
-Alternatively the older Boot2Docker method can be used and you can add your 
+Alternatively the older Boot2Docker method can be used and you can add your
 Registry server's public certificate (in `.pem` or `.crt` format) into
 the `/var/lib/boot2docker/certs/` directory, and Boot2Docker will automatically
 load it from the persistence partition at boot.
