@@ -14,6 +14,8 @@ mirrors=(
 kernelBase='5.15'
 # https://download.docker.com/linux/static/stable/x86_64/
 dockerBase='20.10'
+# https://github.com/plougher/squashfs-tools/releases
+squashfsBase='4'
 # https://download.virtualbox.org/virtualbox/
 vboxBase='6'
 # https://www.parallels.com/products/desktop/download/
@@ -109,6 +111,16 @@ dockerVersion="$(
 )"
 seds+=(
 	-e 's!^(ENV DOCKER_VERSION).*!\1 '"$dockerVersion"'!'
+)
+
+squashfsVersion="$(
+	wget -qO- 'https://api.github.com/repos/plougher/squashfs-tools/releases' \
+		| jq -r --arg base "$squashfsBase" '[.[] | .tag_name | select(startswith($base + "."))][0]' \
+		| sed -e 's!^v!!'
+)"
+seds+=(
+	-e 's!^(ENV SQUASHFS_VERSION).*!\1 '"$squashfsVersion"'!'
+	-e 's!^(# https://github.com/plougher/squashfs-tools/blob/).*(/squashfs-tools/Makefile#L1)$!\1'"$squashfsVersion"'\2!'
 )
 
 vboxVersion="$(

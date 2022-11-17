@@ -122,12 +122,13 @@ RUN mkdir -p proc; \
 
 # as of squashfs-tools 4.4, TCL's unsquashfs is broken... (fails to unsquashfs *many* core tcz files)
 # https://github.com/plougher/squashfs-tools/releases
-ENV SQUASHFS_VERSION 4.4
+# updated via "update.sh"
+ENV SQUASHFS_VERSION 4.5.1
 RUN wget -O squashfs.tgz "https://github.com/plougher/squashfs-tools/archive/$SQUASHFS_VERSION.tar.gz"; \
 	tar --directory=/usr/src --extract --file=squashfs.tgz; \
 	make -C "/usr/src/squashfs-tools-$SQUASHFS_VERSION/squashfs-tools" \
 		-j "$(nproc)" \
-# https://github.com/plougher/squashfs-tools/blob/4.4/squashfs-tools/Makefile#L1
+# https://github.com/plougher/squashfs-tools/blob/4.5.1/squashfs-tools/Makefile#L1
 		GZIP_SUPPORT=1 \
 #		XZ_SUPPORT=1 \
 #		LZO_SUPPORT=1 \
