@@ -142,7 +142,7 @@ xenVersion="$(
 	git ls-remote --tags 'https://github.com/xenserver/xe-guest-utilities.git' \
 		| cut -d/ -f3 \
 		| cut -d^ -f1 \
-		| grep -E '^v\d+' \
+		| grep -E '^v[[:digit:]]+' \
 		| cut -dv -f2- \
 		| sort -rV \
 		| head -1
