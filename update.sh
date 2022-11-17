@@ -3,7 +3,7 @@ set -Eeuo pipefail
 
 # http://tinycorelinux.net/
 major='13.x'
-version='13.0'
+version='13.1'
 
 mirrors=(
 	http://distro.ibiblio.org/tinycorelinux
@@ -17,7 +17,7 @@ dockerBase='20.10'
 # https://download.virtualbox.org/virtualbox/
 vboxBase='6'
 # https://www.parallels.com/products/desktop/download/
-parallelsBase='17'
+parallelsBase='18'
 
 # avoid issues with slow Git HTTP interactions (*cough* sourceforge *cough*)
 export GIT_HTTP_LOW_SPEED_LIMIT='100'
