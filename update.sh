@@ -20,6 +20,8 @@ squashfsBase='4'
 vboxBase='6'
 # https://www.parallels.com/products/desktop/download/
 parallelsBase='18'
+# https://github.com/bcicen/ctop/releases
+ctopBase='0.7'
 
 # avoid issues with slow Git HTTP interactions (*cough* sourceforge *cough*)
 export GIT_HTTP_LOW_SPEED_LIMIT='100'
@@ -161,6 +163,15 @@ xenVersion="$(
 )"
 seds+=(
 	-e 's!^(ENV XEN_VERSION).*!\1 '"$xenVersion"'!'
+)
+
+ctopVersion="$(
+	wget -qO- 'https://api.github.com/repos/bcicen/ctop/releases' \
+		| jq -r --arg base "v$ctopBase" '[.[] | .tag_name | select(startswith($base + "."))][0]' \
+		| sed -e 's!^v!!'
+)"
+seds+=(
+	-e 's!^(ENV CTOP_VERSION).*!\1 '"$ctopVersion"'!'
 )
 
 set -x

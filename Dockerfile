@@ -442,6 +442,12 @@ RUN DOCKER_CHANNEL='stable'; \
 		chroot . "$binary" --version; \
 	done
 
+# CTOP - https://github.com/bcicen/ctop
+# updated via "update.sh"
+ENV CTOP_VERSION 0.7.7
+RUN wget -O usr/local/bin/ctop "https://github.com/bcicen/ctop/releases/download/v$CTOP_VERSION/ctop-$CTOP_VERSION-linux-amd64" ; \
+	chmod +x usr/local/bin/ctop
+
 # set up docker
 RUN mkdir -p etc/docker; \
 	{ \
