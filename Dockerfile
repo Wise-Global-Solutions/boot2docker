@@ -367,6 +367,7 @@ RUN tcl-tce-load open-vm-tools; \
 	tcl-chroot which vmtoolsd; \
 	rm etc/profile.d/open-vm-tools.sh
 
+# https://www.parallels.com/products/desktop/download/
 # updated via "update.sh"
 ENV PARALLELS_VERSION 18.1.0-53311
 
@@ -414,6 +415,7 @@ RUN wget -O usr/local/sbin/cgroupfs-mount "https://github.com/tianon/cgroupfs-mo
 	chmod +x usr/local/sbin/cgroupfs-mount; \
 	tcl-chroot cgroupfs-mount
 
+# https://download.docker.com/linux/static/stable/x86_64/
 # updated via "update.sh"
 ENV DOCKER_VERSION 20.10.21
 
