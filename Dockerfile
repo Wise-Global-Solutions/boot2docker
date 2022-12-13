@@ -18,6 +18,10 @@ RUN apt-get update; \
 		libc6-dev \
 		libelf-dev \
 		libssl-dev \
+		liblzma-dev \
+		liblzo2-dev \
+		liblz4-dev \
+		libzstd-dev \
 		make \
 		p7zip-full \
 		patch \
@@ -130,10 +134,10 @@ RUN wget -O squashfs.tgz "https://github.com/plougher/squashfs-tools/archive/$SQ
 		-j "$(nproc)" \
 # https://github.com/plougher/squashfs-tools/blob/4.5.1/squashfs-tools/Makefile#L1
 		GZIP_SUPPORT=1 \
-#		XZ_SUPPORT=1 \
-#		LZO_SUPPORT=1 \
-#		LZ4_SUPPORT=1 \
-#		ZSTD_SUPPORT=1 \
+		XZ_SUPPORT=1 \
+		LZO_SUPPORT=1 \
+		LZ4_SUPPORT=1 \
+		ZSTD_SUPPORT=1 \
 		EXTRA_CFLAGS='-static' \
 		EXTRA_LDFLAGS='-static' \
 		INSTALL_DIR="$PWD/usr/local/bin" \
