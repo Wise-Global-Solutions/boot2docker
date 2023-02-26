@@ -6,18 +6,17 @@ major='13.x'
 version='13.1'
 
 mirrors=(
-	http://distro.ibiblio.org/tinycorelinux
-	http://repo.tinycorelinux.net
+	https://distro.ibiblio.org/tinycorelinux
 )
 
 # https://www.kernel.org/
-kernelBase='5.15'
+kernelBase='6.1'
 # https://download.docker.com/linux/static/stable/x86_64/
 dockerBase='23.0'
 # https://github.com/plougher/squashfs-tools/releases
-squashfsBase='4'
+squashfsBase='4.5'
 # https://download.virtualbox.org/virtualbox/
-vboxBase='7'
+vboxBase='7.0'
 # https://www.parallels.com/products/desktop/download/
 parallelsBase='18'
 # https://github.com/bcicen/ctop/releases
@@ -29,7 +28,7 @@ export GIT_HTTP_LOW_SPEED_TIME='2'
 # ... or servers being down
 wget() { command wget --timeout=2 "$@" -o /dev/null; }
 
-tclLatest="$(wget -qO- 'http://distro.ibiblio.org/tinycorelinux/latest-x86_64')"
+tclLatest="$(wget -qO- 'https://distro.ibiblio.org/tinycorelinux/latest-x86_64')"
 if [ $tclLatest != $version ]; then
 	echo "Tiny Core Linux has an update! ($tclLatest)"
 	exit 1

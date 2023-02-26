@@ -41,11 +41,10 @@ RUN echo 'progress = dot:giga' >> ~/.wgetrc; \
 WORKDIR /rootfs
 
 # updated via "update.sh"
-ENV TCL_MIRRORS http://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinux.net
+ENV TCL_MIRRORS https://distro.ibiblio.org/tinycorelinux
 ENV TCL_MAJOR 13.x
 ENV TCL_VERSION 13.1
 
-# http://distro.ibiblio.org/tinycorelinux/8.x/x86_64/archive/8.2.1/distribution_files/rootfs64.gz.md5.txt
 # updated via "update.sh"
 ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="337441ac3eb75561a9d702d783e678ba"
 
@@ -181,10 +180,14 @@ ENV LINUX_GPG_KEYS \
 # Linus Torvalds
 		ABAF11C65A2970B130ABE3C479BE3E4300411886 \
 # Greg Kroah-Hartman
-		647F28654894E3BD457199BE38DBBDC86092693E
+		647F28654894E3BD457199BE38DBBDC86092693E \
+# Sasha Levin
+		E27E5D8A3403A2EF66873BBCDEA66FF797772CDC \
+# Ben Hutchings
+		AC2B29BD34A6AFDDB3F68F35E7BFC8EC95861109
 
 # updated via "update.sh"
-ENV LINUX_VERSION 5.15.95
+ENV LINUX_VERSION 6.1.14
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -197,12 +200,11 @@ RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERS
 	export GNUPGHOME="$(mktemp -d)"; \
 	for key in $LINUX_GPG_KEYS; do \
 		for mirror in \
-			ha.pool.sks-keyservers.net \
-			pgp.mit.edu \
-			hkp://p80.pool.sks-keyservers.net:80 \
-			ipv4.pool.sks-keyservers.net \
-			keyserver.ubuntu.com \
-			hkp://keyserver.ubuntu.com:80 \
+			ldap://keyserver.pgp.com \
+			hkps://keyring.debian.org \
+			hkps://keyserver.ubuntu.com \
+			hkp://pgp.surf.nl \
+			hkp://pgp.rediris.es \
 		; do \
 			if gpg --batch --verbose --keyserver "$mirror" --keyserver-options timeout=5 --recv-keys "$key"; then \
 				break; \
@@ -484,11 +486,11 @@ RUN { \
 		echo "server $num.boot2docker.pool.ntp.org"; \
 	done > etc/ntp.conf; \
 	rm -v etc/sysconfig/ntpserver; \
-	sed -i "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=12.0|g" etc/init.d/tc-functions
+	sed -i "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=$TCL_VERSION|g" etc/init.d/tc-functions
 
 # fix tce-load
 RUN mv etc/init.d/tc-functions etc/init.d/tc-functions.orig; \
-	sed "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=12.0|g" \
+	sed "s|\$(grep '^VERSION_ID=' /etc/os-release)|VERSION_ID=$TCL_VERSION|g" \
 		etc/init.d/tc-functions.orig \
 		> etc/init.d/tc-functions
 
