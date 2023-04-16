@@ -42,11 +42,11 @@ WORKDIR /rootfs
 
 # updated via "update.sh"
 ENV TCL_MIRRORS https://distro.ibiblio.org/tinycorelinux
-ENV TCL_MAJOR 13.x
-ENV TCL_VERSION 13.1
+ENV TCL_MAJOR 14.x
+ENV TCL_VERSION 14.0
 
 # updated via "update.sh"
-ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="337441ac3eb75561a9d702d783e678ba"
+ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="9b83cc61e606c631fa58dd401ee3f631"
 
 COPY files/tce-load.patch files/udhcpc.patch /tcl-patches/
 
@@ -126,12 +126,12 @@ RUN mkdir -p proc; \
 # as of squashfs-tools 4.4, TCL's unsquashfs is broken... (fails to unsquashfs *many* core tcz files)
 # https://github.com/plougher/squashfs-tools/releases
 # updated via "update.sh"
-ENV SQUASHFS_VERSION 4.5.1
+ENV SQUASHFS_VERSION 4.6.1
 RUN wget -O squashfs.tgz "https://github.com/plougher/squashfs-tools/archive/$SQUASHFS_VERSION.tar.gz"; \
 	tar --directory=/usr/src --extract --file=squashfs.tgz; \
 	make -C "/usr/src/squashfs-tools-$SQUASHFS_VERSION/squashfs-tools" \
 		-j "$(nproc)" \
-# https://github.com/plougher/squashfs-tools/blob/4.5.1/squashfs-tools/Makefile#L1
+# https://github.com/plougher/squashfs-tools/blob/4.6.1/squashfs-tools/Makefile#L1
 		GZIP_SUPPORT=1 \
 		XZ_SUPPORT=1 \
 		LZO_SUPPORT=1 \
@@ -187,7 +187,7 @@ ENV LINUX_GPG_KEYS \
 		AC2B29BD34A6AFDDB3F68F35E7BFC8EC95861109
 
 # updated via "update.sh"
-ENV LINUX_VERSION 6.1.23
+ENV LINUX_VERSION 6.1.24
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -213,11 +213,11 @@ RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERS
 			gpg-ldap://keyserver-legacy.pgp.com \
 		; do \
 			if url=$(echo "$mirror" | grep "^gpg-"| sed -e 's|^gpg-||g') && \
-				gpg --batch --verbose --keyserver "$url" --keyserver-options timeout=5 --recv-keys "$key";\
+				gpg --batch --verbose --keyserver "$url" --keyserver-options timeout=5 --recv-keys "$key"; \
 			then \
 				break; \
 			elif url=$(echo "$mirror" | grep "^wget-"| sed -e 's|^wget-||g') && \
-				wget -O- "$url" | gpg --import;\
+				wget -O- "$url" | gpg --import; \
 			then \
 				break; \
 			fi; \
@@ -325,9 +325,7 @@ RUN tcl-tce-load \
 		acpid \
 		bash-completion \
 		ca-certificates \
-		curl \
 		e2fsprogs \
-		git \
 		iproute2 \
 		iptables \
 		ncursesw-terminfo \
@@ -336,7 +334,6 @@ RUN tcl-tce-load \
 		openssl-1.1.1 \
 		parted \
 		procps-ng \
-		rsync \
 		tar \
 		util-linux \
 		xz
@@ -352,7 +349,7 @@ RUN echo 'for i in /usr/local/etc/profile.d/*.sh ; do if [ -r "$i" ]; then . $i;
 # install kernel headers so we can use them for building xen-utils, etc
 RUN make -C /usr/src/linux INSTALL_HDR_PATH=/usr/local headers_install
 
-# http://download.virtualbox.org/virtualbox/
+# https://download.virtualbox.org/virtualbox/
 # updated via "update.sh"
 ENV VBOX_VERSION 7.0.6
 # https://www.virtualbox.org/download/hashes/$VBOX_VERSION/SHA256SUMS
@@ -387,7 +384,7 @@ RUN tcl-tce-load open-vm-tools; \
 
 # https://www.parallels.com/products/desktop/download/
 # updated via "update.sh"
-ENV PARALLELS_VERSION 18.1.1-53328
+ENV PARALLELS_VERSION 18.2.0-53488
 
 RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
 	mkdir /usr/src/parallels; \
@@ -422,6 +419,28 @@ RUN make -C /usr/src/xen -j "$(nproc)" VENDORDIR="/usr/src/xen/vendor/xe-guest-u
 RUN make -C /usr/src/linux/tools/hv hv_kvp_daemon; \
 	cp /usr/src/linux/tools/hv/hv_kvp_daemon usr/local/sbin/; \
 	tcl-chroot hv_kvp_daemon --help || [ "$?" = 1 ]
+
+# TCL includes QEMU's guest agent 2.0.2+ (no reason to compile that ourselves)
+RUN qemuTemp="$(mktemp -d)"; \
+	pushd "$qemuTemp"; \
+	for mirror in $TCL_MIRRORS; do \
+		if wget -O qemu.tcz "$mirror/$TCL_MAJOR/x86_64/tcz/qemu.tcz" && \
+			wget -O- "$mirror/$TCL_MAJOR/x86_64/tcz/qemu.tcz.md5.txt" | md5sum -c -; \
+		then \
+			break; \
+		fi; \
+	done; \
+	wget -O- "$mirror/$TCL_MAJOR/x86_64/tcz/qemu.tcz.md5.txt" | md5sum -c -; \
+	unsquashfs -f -d . qemu.tcz /usr/local/bin/qemu-ga; \
+	popd; \
+	cp "$qemuTemp/usr/local/bin/qemu-ga" usr/local/bin/; \
+	rm -rf "$qemuTemp"; \
+	tcl-chroot qemu-ga --help || [ "$?" = 1 ]
+
+# TCL includes SPICE's agent 0.16.0+ (no reason to compile that ourselves)
+RUN tcl-tce-load spice-vdagent; \
+	tcl-chroot spice-vdagentd -h || [ "$?" = 1 ]; \
+	tcl-chroot spice-vdagent -h || [ "$?" = 1 ]
 
 # scan all built modules for kernel loading
 RUN tcl-chroot depmod "$(< /usr/src/linux/include/config/kernel.release)"
