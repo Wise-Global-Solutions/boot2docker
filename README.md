@@ -1,6 +1,6 @@
 # Boot2Docker
 
-[![Build Status](https://github.com/silver886/boot2docker/actions/workflows/ci.yaml/badge.svg)](https://github.com/silver886/boot2docker/actions/workflows/ci.yaml)
+[![Build Status](https://github.com/NasuTek/boot2docker/actions/workflows/ci.yaml/badge.svg)](https://github.com/NasuTek/boot2docker/actions/workflows/ci.yaml)
 
 Boot2Docker is a lightweight Linux distribution made specifically to run
 [Docker](https://www.docker.com/) containers. It runs completely from RAM, is a
