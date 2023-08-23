@@ -10,7 +10,7 @@ jobs:
     name: Create release
     permissions:
       contents: write
-    uses: NasuTek/github-actions/.github/workflows/create-release.yaml@dev
+    uses: NasuTek/boot2docker/.github/workflows/create-release.yaml@dev
 
   release-package:
     name: ISO image
