@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: NasuTek/boot2docker/checkout@dev
+        uses: NasuTek/github-actions/checkout@dev
       - name: Prepare Environment
         run: docker system prune --all --force --volumes
       - name: Happy Eyeballs
