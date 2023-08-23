@@ -10,7 +10,7 @@ jobs:
     name: Create release
     permissions:
       contents: write
-    uses: silver886/github-actions/.github/workflows/create-release.yaml@master
+    uses: NasuTek/github-actions/.github/workflows/create-release.yaml@dev
 
   release-package:
     name: ISO image

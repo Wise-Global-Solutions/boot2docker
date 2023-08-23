@@ -13,16 +13,16 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout code
-        uses: silver886/github-actions/checkout@master
+        uses: NasuTek/github-actions/checkout@dev
       - name: Update Dockerfile
         run: ./update.sh
       - name: Create Token
         id: token
-        uses: silver886/github-actions/create/token@master
+        uses: NasuTek/github-actions/create/token@dev
         with:
           app_id: ${{ secrets.GH_APP_ID }}
           private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
       - name: Create Pull Request
-        uses: silver886/github-actions/create/pull-request@master
+        uses: NasuTek/github-actions/create/pull-request@dev
         with:
           token: ${{ steps.token.outputs.token }}
