@@ -7,15 +7,15 @@ on:
 
 jobs:
   create-release:
-      name: Create release
-      runs-on: ubuntu-22.04
-      permissions:
-        contents: write
-      steps:
-        - name: Create release
-          uses: softprops/action-gh-release@v1
-          with:
-            name: Release ${{ github.ref_name }}
+    name: Create release
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ github.ref_name }}
   release-package:
     name: ISO image
     needs: create-release
